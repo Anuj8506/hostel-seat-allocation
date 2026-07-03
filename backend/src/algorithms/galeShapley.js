@@ -78,7 +78,14 @@ function galeShapley(students, hostels) {
             }
         }
     }
-    return { studentMatch, hostelHoldings };
+    const unmatchedStudents = [];
+    for (const studentId in studentMatch) {
+        if (studentMatch[studentId] === null) {
+        unmatchedStudents.push(studentId);
+        }
+    }
+
+    return { studentMatch, hostelHoldings, unmatchedStudents };
 }
 
 module.exports = galeShapley;
