@@ -2,10 +2,10 @@ const dns = require("dns");
 dns.setServers(["8.8.8.8" , "8.8.4.4"]);
 
 const dotenv = require('dotenv');
-dotenv.config();
+dotenv.config({ path: '../.env' });
 
-const app = require('./src/app');
-const connectDB = require('./src/config/db');
+const app = require('./app');
+const connectDB = require('./config/db');
 
 const PORT = process.env.PORT || 5000;
 
