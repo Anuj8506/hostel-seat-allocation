@@ -49,22 +49,24 @@ const runRound1 = async (req, res) => {
       });
     };
 
-    const shapeRooms = (rooms) => {
+    const shapeRooms = (rooms, rankedStudents) => {
+      const preferenceOrder = rankedStudents.map(s => s._id.toString());
       return rooms.map(room => ({
         id: room._id.toString(),
         capacity: room.capacity,
-        currentlyHeld: []
+        currentlyHeld: [],
+        preferences: preferenceOrder
       }));
     };
 
     // Step 6 - Run algorithm separately for each pool
     const firstYearResult = galeShapley(
       shapeStudents(rankedFirstYear, firstYearPreferences),
-      shapeRooms(firstYearRooms)
+      shapeRooms(firstYearRooms, rankedFirstYear)
     );
     const seniorResult = galeShapley(
       shapeStudents(rankedSenior, seniorPreferences),
-      shapeRooms(seniorRooms)
+      shapeRooms(seniorRooms, rankedSenior)
     );
 
     // Step 7 - Combine both pools results
@@ -107,6 +109,7 @@ const runRound1 = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Error in runRound1:', error);
     return res.status(500).json({ message: error.message });
   }
 };
@@ -165,7 +168,8 @@ const runRound2 = async (req, res) => {
       availableFirstYearRooms.map(room => ({
         id: room._id.toString(),
         capacity: room.capacity,
-        currentlyHeld: []
+        currentlyHeld: [],
+        preferences: rankedFirstYear.map(s => s._id.toString())
       }))
     );
 
@@ -182,7 +186,8 @@ const runRound2 = async (req, res) => {
       availableSeniorRooms.map(room => ({
         id: room._id.toString(),
         capacity: room.capacity,
-        currentlyHeld: []
+        currentlyHeld: [],
+        preferences: rankedSenior.map(s => s._id.toString())
       }))
     );
 
@@ -227,9 +232,10 @@ const runRound2 = async (req, res) => {
       unmatchedStudents: stillUnmatched
     });
 
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
+    } catch (error) {
+      console.error('Error in runRound2:', error);
+      return res.status(500).json({ message: error.message });
+    }
 };
 
 const getAllResults = async (req, res) => {
