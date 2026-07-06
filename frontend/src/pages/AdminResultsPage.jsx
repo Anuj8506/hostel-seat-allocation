@@ -10,7 +10,7 @@ function AdminResultsPage() {
     const fetchResults = async () => {
       try {
         const response = await getAllResults()
-        setResults(response.data.results)
+        setResults(response.data.allocations)
       } catch {
         setError('Failed to load results. Please try again.')
       } finally {
