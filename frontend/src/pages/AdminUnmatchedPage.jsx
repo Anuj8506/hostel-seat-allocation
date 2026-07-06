@@ -10,7 +10,7 @@ function AdminUnmatchedPage() {
     const fetchUnmatched = async () => {
       try {
         const response = await getUnmatchedStudents()
-        setStudents(response.data.students)
+        setStudents(response.data.unmatched)
       } catch {
         setError('Failed to load unmatched students. Please try again.')
       } finally {
