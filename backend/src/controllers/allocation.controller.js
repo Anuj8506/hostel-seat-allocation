@@ -82,10 +82,13 @@ const runRound1 = async (req, res) => {
     // Step 8 - Save allocations to DB
     const allocationDocs = [];
     for (const [studentId, roomId] of Object.entries(combinedStudentMatch)) {
-      const preference = await Preference.findOne({
-        student: studentId,
-        round: 1
-      });
+      if (!roomId) continue; // skip unmatched students
+
+      const preference = await Preference.findOne({ student: studentId, round: 1 });
+      if (!preference) {
+        console.error(`No preference found for student ${studentId}`);
+        continue;
+      }
 
       allocationDocs.push({
         student: studentId,
@@ -203,11 +206,13 @@ const runRound2 = async (req, res) => {
 
     // Step 7 - Save round 2 allocations to DB
     const allocationDocs = [];
-    for (const [studentId, roomId] of Object.entries(studentMatch)) {
-      const preference = await Preference.findOne({
-        student: studentId,
-        round: 2
-      });
+    for (const [studentId, roomId] of Object.entries(combinedStudentMatch)) {
+      if (!roomId) continue; // skip unmatched students
+      const preference = await Preference.findOne({ student: studentId, round: 1 });
+      if (!preference) {
+        console.error(`No preference found for student ${studentId}`);
+        continue;
+      }
 
       allocationDocs.push({
         student: studentId,
