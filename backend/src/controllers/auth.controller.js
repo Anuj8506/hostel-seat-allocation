@@ -48,10 +48,10 @@ const register = async (req, res) => {
 
     // Generate token
     const token = jwt.sign(
-      { id: student._id },
+      { id: student._id, isAdmin: student.isAdmin, name: student.name },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
-    );
+    )
 
     return res.status(201).json({
       message: 'Registration successful',
@@ -93,10 +93,10 @@ const login = async (req, res) => {
 
     // Generate token
     const token = jwt.sign(
-      { id: student._id },
+      { id: student._id, isAdmin: student.isAdmin, name: student.name },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
-    );
+    )
 
     return res.status(200).json({
       message: 'Login successful',

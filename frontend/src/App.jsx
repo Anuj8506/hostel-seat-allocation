@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { isAuthenticated, getUser } from './utils/auth'
+import Navbar from './components/Navbar'
 
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
@@ -7,19 +8,29 @@ import PreferencePage from './pages/PreferencePage'
 import Round2PreferencePage from './pages/Round2PreferencePage'
 import AllocationResultPage from './pages/AllocationResultPage'
 import AdminRoomsPage from './pages/AdminRoomsPage'
-import AdminRunAllocationPage from './pages/AdminRunAllocationPage.jsx'
+import AdminRunAllocationPage from './pages/AdminRunAllocationPage'
 import AdminResultsPage from './pages/AdminResultsPage'
 import AdminUnmatchedPage from './pages/AdminUnmatchedPage'
 
 const ProtectedRoute = ({ children }) => {
   if (!isAuthenticated()) return <Navigate to="/login" replace />
-  return children
+  return (
+    <>
+      <Navbar />
+      {children}
+    </>
+  )
 }
 
 const AdminRoute = ({ children }) => {
   const user = getUser()
   if (!isAuthenticated() || !user?.isAdmin) return <Navigate to="/login" replace />
-  return children
+  return (
+    <>
+      <Navbar />
+      {children}
+    </>
+  )
 }
 
 function App() {

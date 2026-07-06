@@ -21,35 +21,62 @@ function AllocationResultPage() {
         setLoading(false)
       }
     }
-
     fetchAllocation()
   }, [])
 
-  if (loading) return <div>Loading your allocation...</div>
+  if (loading) return (
+    <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+      <p className="text-gray-400 text-lg">Loading your allocation...</p>
+    </div>
+  )
 
   return (
-    <div>
-      <h1>Hostel Seat Allocation</h1>
-      <h2>Your Allocation Result</h2>
+    <div className="min-h-screen bg-gray-950 px-4 py-10">
+      <div className="max-w-2xl mx-auto">
+        <h1 className="text-3xl font-bold text-white mb-1">Hostel Seat Allocation</h1>
+        <p className="text-gray-400 mb-8">Your best room awaits.</p>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+        <div className="bg-gray-900 rounded-2xl shadow-2xl p-8">
+          <h2 className="text-xl font-semibold text-white mb-6">Your Allocation Result</h2>
 
-      {!error && allocation === null && (
-        <div>
-          <p>You have not been allocated a room yet.</p>
-          <p>Please wait for the allocation process to complete.</p>
+          {error && (
+            <div className="bg-red-500/10 border border-red-500 text-red-400 rounded-lg px-4 py-3 text-sm">
+              {error}
+            </div>
+          )}
+
+          {!error && allocation === null && (
+            <div className="bg-yellow-500/10 border border-yellow-500 rounded-xl p-6 text-center">
+              <p className="text-yellow-400 font-semibold text-lg mb-1">Not Allocated Yet</p>
+              <p className="text-gray-400 text-sm">Please wait for the allocation process to complete.</p>
+            </div>
+          )}
+
+          {allocation && (
+            <div className="bg-green-500/10 border border-green-500 rounded-xl p-6">
+              <p className="text-green-400 font-semibold text-lg mb-4">🎉 Congratulations! You have been allocated a room.</p>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Hostel</span>
+                  <span className="text-white font-medium">{allocation.room.hostelName}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Category</span>
+                  <span className="text-white font-medium capitalize">{allocation.room.category}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Round</span>
+                  <span className="text-white font-medium">Round {allocation.round}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Status</span>
+                  <span className="text-green-400 font-medium capitalize">{allocation.status}</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-      )}
-
-      {allocation && (
-        <div>
-          <p>Congratulations! You have been allocated a room.</p>
-          <p>Hostel: {allocation.room.hostelName}</p>
-          <p>Category: {allocation.room.category}</p>
-          <p>Round: {allocation.round}</p>
-          <p>Status: {allocation.status}</p>
-        </div>
-      )}
+      </div>
     </div>
   )
 }
