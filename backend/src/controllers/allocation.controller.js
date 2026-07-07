@@ -95,6 +95,18 @@ const runRound1 = async (req, res) => {
         continue;
       }
 
+      // Atomic capacity guard — only increments if room still has space
+      const updatedRoom = await Room.findOneAndUpdate(
+        { _id: roomId, $expr: { $lt: ['$currentOccupancy', '$capacity'] } },
+        { $inc: { currentOccupancy: 1 } },
+        { new: true }
+      );
+
+      if (!updatedRoom) {
+        console.error(`Room ${roomId} is full or invalid — skipping allocation for student ${studentId}`);
+        continue;
+      }
+
       allocationDocs.push({
         student: studentId,
         room: roomId,
@@ -103,7 +115,6 @@ const runRound1 = async (req, res) => {
         status: 'allocated'
       });
 
-      await Room.findByIdAndUpdate(roomId, { $inc: { currentOccupancy: 1 } });
       await Student.findByIdAndUpdate(studentId, { isAllocated: true });
     }
 
@@ -224,6 +235,18 @@ const runRound2 = async (req, res) => {
         continue;
       }
 
+      // Atomic capacity guard — only increments if room still has space
+      const updatedRoom = await Room.findOneAndUpdate(
+        { _id: roomId, $expr: { $lt: ['$currentOccupancy', '$capacity'] } },
+        { $inc: { currentOccupancy: 1 } },
+        { new: true }
+      );
+
+      if (!updatedRoom) {
+        console.error(`Room ${roomId} is full or invalid — skipping allocation for student ${studentId}`);
+        continue;
+      }
+
       allocationDocs.push({
         student: studentId,
         room: roomId,
@@ -232,7 +255,6 @@ const runRound2 = async (req, res) => {
         status: 'allocated'
       });
 
-      await Room.findByIdAndUpdate(roomId, { $inc: { currentOccupancy: 1 } });
       await Student.findByIdAndUpdate(studentId, { isAllocated: true });
     }
 
