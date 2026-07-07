@@ -12,23 +12,27 @@ function PreferencePage() {
   const navigate = useNavigate()
 
     useEffect(() => {
-      const fetchHostels = async () => {
-        try {
-          const allocationResponse = await getMyAllocation()
-          if (allocationResponse.data.allocation) {
-            navigate('/allocation')
-            return
-          }
-          const response = await getAvailableHostels()
-          setRankedHostels(response.data.availableRooms)
-        } catch {
-          setError('Failed to load hostels. Please try again.')
-        } finally {
-          setLoading(false)
+    const fetchHostels = async () => {
+      try {
+        const allocationResponse = await getMyAllocation()
+        if (allocationResponse.data.allocation) {
+          navigate('/allocation')
+          return
         }
+        if (allocationResponse.data.round1HasRun) {
+          navigate('/preferences/round2')
+          return
+        }
+        const response = await getAvailableHostels()
+        setRankedHostels(response.data.availableRooms)
+      } catch {
+        setError('Failed to load hostels. Please try again.')
+      } finally {
+        setLoading(false)
       }
-      fetchHostels()
-    }, [])
+    }
+    fetchHostels()
+  }, [])
 
   const moveUp = (index) => {
     if (index === 0) return
