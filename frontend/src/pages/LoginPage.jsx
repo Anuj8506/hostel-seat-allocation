@@ -19,11 +19,18 @@ function LoginPage() {
     try {
       const response = await login({ email, password })
       setToken(response.data.token)
-      const user = JSON.parse(atob(response.data.token.split('.')[1]))
-      if (user.isAdmin) {
+      const { student } = response.data
+
+      if (student.isAdmin) {
         navigate('/admin/rooms')
-      } else {
+      } else if (student.isAllocated) {
+        navigate('/allocation')
+      } else if (!student.hasSubmittedRound1) {
         navigate('/preferences')
+      } else if (!student.hasSubmittedRound2) {
+        navigate('/preferences/round2')
+      } else {
+        navigate('/allocation')
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please try again.')

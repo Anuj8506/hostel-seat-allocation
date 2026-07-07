@@ -116,11 +116,15 @@ const viewAllocation = async (req, res) => {
       status: 'allocated'
     }).populate('room');
 
-    if (!allocation) {
-      return res.status(404).json({ message: 'No allocation found yet' });
-    }
+    const round2Preference = await Preference.findOne({
+      student: req.user._id,
+      round: 2
+    });
 
-    return res.status(200).json({ allocation });
+    return res.status(200).json({
+      allocation: allocation || null,
+      hasSubmittedRound2: !!round2Preference
+    });
 
   } catch (error) {
     return res.status(500).json({ message: error.message });

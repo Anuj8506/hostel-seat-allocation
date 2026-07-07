@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { getMyAllocation } from '../services/studentService'
 
 function AllocationResultPage() {
   const [allocation, setAllocation] = useState(null)
+  const [hasSubmittedRound2, setHasSubmittedRound2] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -11,12 +13,9 @@ function AllocationResultPage() {
       try {
         const response = await getMyAllocation()
         setAllocation(response.data.allocation)
-      } catch (err) {
-        if (err.response?.status === 404) {
-          setAllocation(null)
-        } else {
-          setError('Failed to load allocation. Please try again.')
-        }
+        setHasSubmittedRound2(response.data.hasSubmittedRound2)
+      } catch {
+        setError('Failed to load allocation. Please try again.')
       } finally {
         setLoading(false)
       }
@@ -45,10 +44,27 @@ function AllocationResultPage() {
             </div>
           )}
 
-          {!error && allocation === null && (
+          {!error && allocation === null && !hasSubmittedRound2 && (
             <div className="bg-yellow-500/10 border border-yellow-500 rounded-xl p-6 text-center">
               <p className="text-yellow-400 font-semibold text-lg mb-1">Not Allocated Yet</p>
-              <p className="text-gray-400 text-sm">Please wait for the allocation process to complete.</p>
+              <p className="text-gray-400 text-sm mb-4">
+                You weren't matched in Round 1. Submit your Round 2 preferences to get another chance.
+              </p>
+              <Link
+                to="/preferences/round2"
+                className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 rounded-lg transition-colors"
+              >
+                Submit Round 2 Preferences
+              </Link>
+            </div>
+          )}
+
+          {!error && allocation === null && hasSubmittedRound2 && (
+            <div className="bg-yellow-500/10 border border-yellow-500 rounded-xl p-6 text-center">
+              <p className="text-yellow-400 font-semibold text-lg mb-1">Not Allocated Yet</p>
+              <p className="text-gray-400 text-sm">
+                Your Round 2 preferences have been submitted. Please wait for the allocation process to complete.
+              </p>
             </div>
           )}
 

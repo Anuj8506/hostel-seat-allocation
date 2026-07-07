@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getAvailableHostels, submitRound2Preferences } from '../services/studentService'
+import { getAvailableHostels, submitRound2Preferences, getMyAllocation } from '../services/studentService'
 
 function Round2PreferencePage() {
   const [rankedHostels, setRankedHostels] = useState([])
@@ -12,18 +12,26 @@ function Round2PreferencePage() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    const fetchHostels = async () => {
+    const checkStatusAndFetchHostels = async () => {
       try {
-        const response = await getAvailableHostels()
-        setRankedHostels(response.data.availableRooms)
+        const statusResponse = await getMyAllocation()
+
+        if (statusResponse.data.allocation) {
+          // Already allocated — nothing to do here, send them to their result
+          navigate('/allocation')
+          return
+        }
+
+        const hostelsResponse = await getAvailableHostels()
+        setRankedHostels(hostelsResponse.data.availableRooms)
       } catch {
         setError('Failed to load hostels. Please try again.')
       } finally {
         setLoading(false)
       }
     }
-    fetchHostels()
-  }, [])
+    checkStatusAndFetchHostels()
+  }, [navigate])
 
   const moveUp = (index) => {
     if (index === 0) return

@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Student = require('../models/Student');
+const Preference = require('../models/Preference');
 const { VALID_BRANCHES } = require('../config/constants');
 
 const register = async (req, res) => {
@@ -98,6 +99,10 @@ const login = async (req, res) => {
       { expiresIn: '7d' }
     )
 
+    // Check preference status to help frontend decide where to route the student
+    const round1Preference = await Preference.findOne({ student: student._id, round: 1 });
+    const round2Preference = await Preference.findOne({ student: student._id, round: 2 });
+
     return res.status(200).json({
       message: 'Login successful',
       token,
@@ -107,7 +112,10 @@ const login = async (req, res) => {
         email: student.email,
         year: student.year,
         branch: student.branch,
-        isAdmin: student.isAdmin
+        isAdmin: student.isAdmin,
+        isAllocated: student.isAllocated,
+        hasSubmittedRound1: !!round1Preference,
+        hasSubmittedRound2: !!round2Preference
       }
     });
 
