@@ -46,6 +46,17 @@ function AllocationResultPage() {
             </div>
           )}
 
+          {/* Round 1 hasn't run yet — just waiting */}
+          {!error && allocation === null && !round1HasRun && (
+            <div className="bg-yellow-500/10 border border-yellow-500 rounded-xl p-6 text-center">
+              <p className="text-yellow-400 font-semibold text-lg mb-1">Not Allocated Yet</p>
+              <p className="text-gray-400 text-sm">
+                The allocation process has not started yet. Please check back after Round 1 runs.
+              </p>
+            </div>
+          )}
+
+          {/* Round 1 has run, unmatched, hasn't submitted Round 2 yet */}
           {!error && allocation === null && round1HasRun && !hasSubmittedRound2 && (
             <div className="bg-yellow-500/10 border border-yellow-500 rounded-xl p-6 text-center">
               <p className="text-yellow-400 font-semibold text-lg mb-1">Not Allocated Yet</p>
@@ -61,6 +72,7 @@ function AllocationResultPage() {
             </div>
           )}
 
+          {/* Round 2 preferences submitted, waiting for Round 2 to run */}
           {!error && allocation === null && hasSubmittedRound2 && (
             <div className="bg-yellow-500/10 border border-yellow-500 rounded-xl p-6 text-center">
               <p className="text-yellow-400 font-semibold text-lg mb-1">Not Allocated Yet</p>
@@ -70,6 +82,7 @@ function AllocationResultPage() {
             </div>
           )}
 
+          {/* Allocated */}
           {allocation && (
             <div className="bg-green-500/10 border border-green-500 rounded-xl p-6">
               <p className="text-green-400 font-semibold text-lg mb-4">🎉 Congratulations! You have been allocated a room.</p>
@@ -93,6 +106,7 @@ function AllocationResultPage() {
               </div>
             </div>
           )}
+
         </div>
       </div>
     </div>
