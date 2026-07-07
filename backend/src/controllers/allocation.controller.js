@@ -8,6 +8,11 @@ const { rankStudents } = require('../services/preferenceScoring');
 
 const runRound1 = async (req, res) => {
   try {
+
+    const existingAllocations = await Allocation.findOne({ round: 1 });
+    if (existingAllocations) {
+      return res.status(400).json({ message: 'Round 1 has already been run. Reset the system before running again.' });
+    }
     // Step 1 - Fetch students split by pool
     const firstYearStudents = await Student.find({
       year: { $in: YEAR_GROUPS.FIRST_YEAR },
@@ -119,6 +124,11 @@ const runRound1 = async (req, res) => {
 
 const runRound2 = async (req, res) => {
   try {
+    // Guard — prevent Round 2 from running twice
+    const existingRound2 = await Allocation.findOne({ round: 2 });
+    if (existingRound2) {
+      return res.status(400).json({ message: 'Round 2 has already been run. Reset the system before running again.' });
+    }
     // Step 1 - Fetch unmatched students split by pool
     const unmatchedFirstYear = await Student.find({
       year: { $in: YEAR_GROUPS.FIRST_YEAR },
