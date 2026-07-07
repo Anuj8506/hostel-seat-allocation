@@ -4,23 +4,20 @@ const allocationSchema = new mongoose.Schema({
     student: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Student',
-        required: true,
+        sparse: true,
         unique: true
     },
     room: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Room',
-        required: true
     },
     preference: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Preference',
-        required: true
     },
     round: {
         type: Number,
         enum: [1, 2],
-        required: true
     },
     status: {
         type: String,

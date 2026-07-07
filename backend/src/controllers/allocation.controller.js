@@ -87,7 +87,7 @@ const runRound1 = async (req, res) => {
     // Step 8 - Save allocations to DB
     const allocationDocs = [];
     for (const [studentId, roomId] of Object.entries(combinedStudentMatch)) {
-      if (!roomId) continue; // skip unmatched students
+      if (!roomId) continue;
 
       const preference = await Preference.findOne({ student: studentId, round: 1 });
       if (!preference) {
@@ -95,7 +95,6 @@ const runRound1 = async (req, res) => {
         continue;
       }
 
-      // Atomic capacity guard — only increments if room still has space
       const updatedRoom = await Room.findOneAndUpdate(
         { _id: roomId, $expr: { $lt: ['$currentOccupancy', '$capacity'] } },
         { $inc: { currentOccupancy: 1 } },
@@ -135,11 +134,13 @@ const runRound1 = async (req, res) => {
 
 const runRound2 = async (req, res) => {
   try {
-    // Guard — prevent Round 2 from running twice
-    const existingRound2 = await Allocation.findOne({ round: 2 });
+    // Guard — prevent Round 2 from running twice (sentinel doc ensures this
+    // fires even when 0 students were allocated in Round 2)
+    const existingRound2 = await Allocation.findOne({ round: 2, status: 'round2-complete' });
     if (existingRound2) {
       return res.status(400).json({ message: 'Round 2 has already been run. Reset the system before running again.' });
     }
+
     // Step 1 - Fetch unmatched students split by pool
     const unmatchedFirstYear = await Student.find({
       year: { $in: YEAR_GROUPS.FIRST_YEAR },
@@ -151,6 +152,7 @@ const runRound2 = async (req, res) => {
     });
 
     if (unmatchedFirstYear.length === 0 && unmatchedSenior.length === 0) {
+      await Allocation.create({ round: 2, status: 'round2-complete' });
       return res.status(200).json({ message: 'No unmatched students remaining' });
     }
 
@@ -228,14 +230,13 @@ const runRound2 = async (req, res) => {
     // Step 7 - Save round 2 allocations to DB
     const allocationDocs = [];
     for (const [studentId, roomId] of Object.entries(studentMatch)) {
-      if (!roomId) continue; // skip unmatched students
+      if (!roomId) continue;
       const preference = await Preference.findOne({ student: studentId, round: 2 });
       if (!preference) {
         console.error(`No preference found for student ${studentId}`);
         continue;
       }
 
-      // Atomic capacity guard — only increments if room still has space
       const updatedRoom = await Room.findOneAndUpdate(
         { _id: roomId, $expr: { $lt: ['$currentOccupancy', '$capacity'] } },
         { $inc: { currentOccupancy: 1 } },
@@ -262,6 +263,9 @@ const runRound2 = async (req, res) => {
       await Allocation.insertMany(allocationDocs);
     }
 
+    // Sentinel doc — marks Round 2 as run regardless of how many were allocated
+    await Allocation.create({ round: 2, status: 'round2-complete' });
+
     return res.status(200).json({
       message: 'Round 2 allocation complete',
       allocated: allocationDocs.length,
@@ -269,10 +273,10 @@ const runRound2 = async (req, res) => {
       unmatchedStudents: stillUnmatched
     });
 
-    } catch (error) {
-      console.error('Error in runRound2:', error);
-      return res.status(500).json({ message: error.message });
-    }
+  } catch (error) {
+    console.error('Error in runRound2:', error);
+    return res.status(500).json({ message: error.message });
+  }
 };
 
 const getAllResults = async (req, res) => {
