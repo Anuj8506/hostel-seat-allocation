@@ -27,9 +27,14 @@ function LoginPage() {
         navigate('/allocation')
       } else if (!student.hasSubmittedRound1) {
         navigate('/preferences')
+      } else if (!student.round1HasRun) {
+        // submitted Round 1 but Round 1 hasn't run yet — just wait
+        navigate('/allocation')
       } else if (!student.hasSubmittedRound2) {
+        // Round 1 has run, student is unmatched, hasn't done Round 2 yet
         navigate('/preferences/round2')
       } else {
+        // submitted Round 2, waiting for Round 2 to run
         navigate('/allocation')
       }
     } catch (err) {

@@ -5,6 +5,7 @@ import { getMyAllocation } from '../services/studentService'
 function AllocationResultPage() {
   const [allocation, setAllocation] = useState(null)
   const [hasSubmittedRound2, setHasSubmittedRound2] = useState(false)
+  const [round1HasRun, setRound1HasRun] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -13,6 +14,7 @@ function AllocationResultPage() {
       try {
         const response = await getMyAllocation()
         setAllocation(response.data.allocation)
+        setRound1HasRun(response.data.round1HasRun)
         setHasSubmittedRound2(response.data.hasSubmittedRound2)
       } catch {
         setError('Failed to load allocation. Please try again.')
@@ -44,7 +46,7 @@ function AllocationResultPage() {
             </div>
           )}
 
-          {!error && allocation === null && !hasSubmittedRound2 && (
+          {!error && allocation === null && round1HasRun && !hasSubmittedRound2 && (
             <div className="bg-yellow-500/10 border border-yellow-500 rounded-xl p-6 text-center">
               <p className="text-yellow-400 font-semibold text-lg mb-1">Not Allocated Yet</p>
               <p className="text-gray-400 text-sm mb-4">
