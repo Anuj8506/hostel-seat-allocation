@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getAvailableHostels, submitPreferences } from '../services/studentService'
+import { getAvailableHostels, submitPreferences, getMyAllocation } from '../services/studentService'
 
 function PreferencePage() {
   const [rankedHostels, setRankedHostels] = useState([])
@@ -11,19 +11,24 @@ function PreferencePage() {
 
   const navigate = useNavigate()
 
-  useEffect(() => {
-    const fetchHostels = async () => {
-      try {
-        const response = await getAvailableHostels()
-        setRankedHostels(response.data.availableRooms)
-      } catch {
-        setError('Failed to load hostels. Please try again.')
-      } finally {
-        setLoading(false)
+    useEffect(() => {
+      const fetchHostels = async () => {
+        try {
+          const allocationResponse = await getMyAllocation()
+          if (allocationResponse.data.allocation) {
+            navigate('/allocation')
+            return
+          }
+          const response = await getAvailableHostels()
+          setRankedHostels(response.data.availableRooms)
+        } catch {
+          setError('Failed to load hostels. Please try again.')
+        } finally {
+          setLoading(false)
+        }
       }
-    }
-    fetchHostels()
-  }, [])
+      fetchHostels()
+    }, [])
 
   const moveUp = (index) => {
     if (index === 0) return
