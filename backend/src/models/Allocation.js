@@ -21,7 +21,7 @@ const allocationSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['allocated', 'cancelled'],
+        enum: ['allocated', 'cancelled', 'round2-complete'],
         default: 'allocated'
     }
     }, {
