@@ -181,41 +181,45 @@ const runRound2 = async (req, res) => {
     });
 
     // Step 5 - Shape and run algorithm separately for each pool
-    const firstYearResult = galeShapley(
-      rankedFirstYear.map(student => {
-        const pref = firstYearPreferences.find(
-          p => p.student.toString() === student._id.toString()
-        );
-        return {
-          id: student._id.toString(),
-          preferences: pref ? pref.rankedHostels.map(h => h.toString()) : []
-        };
-      }),
-      availableFirstYearRooms.map(room => ({
-        id: room._id.toString(),
-        capacity: room.capacity,
-        currentlyHeld: [],
-        preferences: rankedFirstYear.map(s => s._id.toString())
-      }))
-    );
+    const firstYearResult = availableFirstYearRooms.length > 0
+      ? galeShapley(
+          rankedFirstYear.map(student => {
+            const pref = firstYearPreferences.find(
+              p => p.student.toString() === student._id.toString()
+            );
+            return {
+              id: student._id.toString(),
+              preferences: pref ? pref.rankedHostels.map(h => h.toString()) : []
+            };
+          }),
+          availableFirstYearRooms.map(room => ({
+            id: room._id.toString(),
+            capacity: room.capacity,
+            currentlyHeld: [],
+            preferences: rankedFirstYear.map(s => s._id.toString())
+          }))
+        )
+      : { studentMatch: {}, hostelHoldings: {}, unmatchedStudents: rankedFirstYear.map(s => s._id.toString()) };
 
-    const seniorResult = galeShapley(
-      rankedSenior.map(student => {
-        const pref = seniorPreferences.find(
-          p => p.student.toString() === student._id.toString()
-        );
-        return {
-          id: student._id.toString(),
-          preferences: pref ? pref.rankedHostels.map(h => h.toString()) : []
-        };
-      }),
-      availableSeniorRooms.map(room => ({
-        id: room._id.toString(),
-        capacity: room.capacity,
-        currentlyHeld: [],
-        preferences: rankedSenior.map(s => s._id.toString())
-      }))
-    );
+    const seniorResult = availableSeniorRooms.length > 0
+      ? galeShapley(
+          rankedSenior.map(student => {
+            const pref = seniorPreferences.find(
+              p => p.student.toString() === student._id.toString()
+            );
+            return {
+              id: student._id.toString(),
+              preferences: pref ? pref.rankedHostels.map(h => h.toString()) : []
+            };
+          }),
+          availableSeniorRooms.map(room => ({
+            id: room._id.toString(),
+            capacity: room.capacity,
+            currentlyHeld: [],
+            preferences: rankedSenior.map(s => s._id.toString())
+          }))
+        )
+      : { studentMatch: {}, hostelHoldings: {}, unmatchedStudents: rankedSenior.map(s => s._id.toString()) };
 
     // Step 6 - Combine both pools results
     const studentMatch = {
