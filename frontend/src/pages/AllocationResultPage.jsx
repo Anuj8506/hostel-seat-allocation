@@ -6,6 +6,7 @@ function AllocationResultPage() {
   const [allocation, setAllocation] = useState(null)
   const [hasSubmittedRound2, setHasSubmittedRound2] = useState(false)
   const [round1HasRun, setRound1HasRun] = useState(false)
+  const [round2HasRun, setRound2HasRun] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -15,6 +16,7 @@ function AllocationResultPage() {
         const response = await getMyAllocation()
         setAllocation(response.data.allocation)
         setRound1HasRun(response.data.round1HasRun)
+        setRound2HasRun(response.data.round2HasRun)
         setHasSubmittedRound2(response.data.hasSubmittedRound2)
       } catch {
         setError('Failed to load allocation. Please try again.')
@@ -57,7 +59,7 @@ function AllocationResultPage() {
           )}
 
           {/* Round 1 has run, unmatched, hasn't submitted Round 2 yet */}
-          {!error && allocation === null && round1HasRun && !hasSubmittedRound2 && (
+          {!error && allocation === null && round1HasRun && !hasSubmittedRound2 && !round2HasRun && (
             <div className="bg-yellow-500/10 border border-yellow-500 rounded-xl p-6 text-center">
               <p className="text-yellow-400 font-semibold text-lg mb-1">Not Allocated Yet</p>
               <p className="text-gray-400 text-sm mb-4">
@@ -73,11 +75,21 @@ function AllocationResultPage() {
           )}
 
           {/* Round 2 preferences submitted, waiting for Round 2 to run */}
-          {!error && allocation === null && hasSubmittedRound2 && (
+          {!error && allocation === null && hasSubmittedRound2 && !round2HasRun && (
             <div className="bg-yellow-500/10 border border-yellow-500 rounded-xl p-6 text-center">
               <p className="text-yellow-400 font-semibold text-lg mb-1">Not Allocated Yet</p>
               <p className="text-gray-400 text-sm">
                 Your Round 2 preferences have been submitted. Please wait for the allocation process to complete.
+              </p>
+            </div>
+          )}
+
+          {/* Round 2 has run, still unmatched — manual review required */}
+          {!error && allocation === null && round2HasRun && (
+            <div className="bg-red-500/10 border border-red-500 rounded-xl p-6 text-center">
+              <p className="text-red-400 font-semibold text-lg mb-1">Not Allocated</p>
+              <p className="text-gray-400 text-sm">
+                Both rounds are complete and you were not allocated a room. Please contact the admin for manual review.
               </p>
             </div>
           )}

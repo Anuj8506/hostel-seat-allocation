@@ -122,11 +122,13 @@ const viewAllocation = async (req, res) => {
     });
 
     const round1HasRun = await Allocation.findOne({ round: 1 });
+    const round2HasRun = await Allocation.findOne({ round: 2, status: 'round2-complete' });
 
     return res.status(200).json({
       allocation: allocation || null,
       hasSubmittedRound2: !!round2Preference,
-      round1HasRun: !!round1HasRun
+      round1HasRun: !!round1HasRun,
+      round2HasRun: !!round2HasRun
     });
 
   } catch (error) {

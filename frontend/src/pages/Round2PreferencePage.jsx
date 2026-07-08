@@ -17,7 +17,10 @@ function Round2PreferencePage() {
         const statusResponse = await getMyAllocation()
 
         if (statusResponse.data.allocation) {
-          // Already allocated — nothing to do here, send them to their result
+          navigate('/allocation')
+          return
+        }
+        if (statusResponse.data.round2HasRun) {
           navigate('/allocation')
           return
         }
